@@ -47,9 +47,6 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install PM2
-        run: npm install -g pm2
-
       - name: Download test results artifact
         uses: actions/download-artifact@v4
         with:
@@ -61,7 +58,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Deploy application
+      - name: Deploy application with PM2
         run: |
           echo "Deploying Node.js application..."
           pm2 delete node-app || true
