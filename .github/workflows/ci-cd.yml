@@ -36,8 +36,7 @@ jobs:
   deploy:
     name: Deploy Job
     needs: test
-    runs-on: self-hosted
-    labels: node-runner
+    runs-on: [self-hosted, node-runner]
 
     steps:
       - name: Checkout source code
