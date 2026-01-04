@@ -15,7 +15,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -42,10 +42,27 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+      - name: Install Node.js 22 (System-wide)
+        run: |
+          if ! command -v node >/dev/null 2>&1; then
+            curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+          fi
+
+      - name: Verify Node & npm
+        run: |
+          node -v
+          npm -v
+
+      - name: Install PM2 system-wide
+        run: |
+          if ! command -v pm2 >/dev/null 2>&1; then
+            sudo npm install -g pm2
+          fi
+
+      - name: Configure PM2 startup
+        run: |
+          pm2 startup systemd -u ubuntu --hp /home/ubuntu || true
 
       - name: Download test results artifact
         uses: actions/download-artifact@v4
@@ -55,7 +72,7 @@ jobs:
       - name: Display test results
         run: cat test-results.txt
 
-      - name: Install dependencies
+      - name: Install application dependencies
         run: npm install
 
       - name: Deploy application with PM2
