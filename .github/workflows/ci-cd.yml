@@ -42,28 +42,32 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Install Node.js 22 (System-wide)
+      # 1️⃣ Install Node.js 22 PERMANENTLY
+      - name: Install Node.js 22 system-wide
         run: |
           if ! command -v node >/dev/null 2>&1; then
             curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
             sudo apt-get install -y nodejs
           fi
 
-      - name: Verify Node & npm
+      - name: Verify Node and npm
         run: |
           node -v
           npm -v
 
+      # 2️⃣ Install PM2 PERMANENTLY
       - name: Install PM2 system-wide
         run: |
           if ! command -v pm2 >/dev/null 2>&1; then
             sudo npm install -g pm2
           fi
 
+      # 3️⃣ Ensure PM2 starts on reboot
       - name: Configure PM2 startup
         run: |
           pm2 startup systemd -u ubuntu --hp /home/ubuntu || true
 
+      # 4️⃣ Get test artifact
       - name: Download test results artifact
         uses: actions/download-artifact@v4
         with:
@@ -72,13 +76,16 @@ jobs:
       - name: Display test results
         run: cat test-results.txt
 
+      # 5️⃣ Install app dependencies
       - name: Install application dependencies
         run: npm install
 
-      - name: Deploy application with PM2
+      # 6️⃣ DEPLOY AND MAKE IT STAY RUNNING
+      - name: Deploy application and persist
         run: |
           echo "Deploying Node.js application..."
           pm2 delete node-app || true
           pm2 start "./src/server.js" --name node-app
           pm2 save
+          pm2 list
 
