@@ -18,16 +18,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
 
       - name: Install dependencies
         run: npm install
 
       - name: Run tests and save results
         run: |
-          npm test > test-results.txt || true
+          npm run check > test-results.txt || true
 
-      - name: Upload test results as artifact
+      - name: Upload test results artifact
         uses: actions/upload-artifact@v4
         with:
           name: test-results
@@ -46,6 +46,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - name: Install PM2
         run: npm install -g pm2
 
@@ -62,7 +63,8 @@ jobs:
 
       - name: Deploy application
         run: |
-          echo "Starting deployment..."
+          echo "Deploying Node.js application..."
           pm2 delete node-app || true
-          pm2 start index.js --name node-app
+          pm2 start "./src/server.js" --name node-app
+          pm2 save
 
