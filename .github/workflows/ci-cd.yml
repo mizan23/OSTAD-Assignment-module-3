@@ -34,32 +34,33 @@ jobs:
           path: test-results.txt
 
   deploy:
-  name: Deploy Job
-  needs: test
-  runs-on: [self-hosted, node-runner]
+    name: Deploy Job
+    needs: test
+    runs-on: [self-hosted, node-runner]
 
-  steps:
-    - name: Checkout source code
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-    - name: Download test results artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: test-results
+      - name: Download test results artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
 
-    - name: Display test results
-      run: cat test-results.txt
+      - name: Display test results
+        run: cat test-results.txt
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Deploy application
-      run: |
-        pm2 delete node-app || true
-        pm2 start index.js --name node-app
+      - name: Deploy application
+        run: |
+          echo "Starting deployment..."
+          pm2 delete node-app || true
+          pm2 start index.js --name node-app
 
